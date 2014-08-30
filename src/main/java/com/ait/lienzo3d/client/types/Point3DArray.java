@@ -164,7 +164,7 @@ public final class Point3DArray implements Iterable<Point3D>
 
     public final Collection<Point3D> getPoints()
     {
-        int leng = size();
+        final int leng = size();
 
         ArrayList<Point3D> list = new ArrayList<Point3D>(leng);
 
