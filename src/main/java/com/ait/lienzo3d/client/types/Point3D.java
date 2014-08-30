@@ -128,14 +128,14 @@ public final class Point3D
         return Point3DJSO.distance(a.getJSO(), b.getJSO());
     };
 
-    public final Point3D plus(Point3D p)
+    public final Point3D add(Point3D p)
     {
-        return new Point3D(m_jso.plus(p.getJSO()));
+        return new Point3D(m_jso.add(p.getJSO()));
     }
 
-    public final Point3D minus(Point3D p)
+    public final Point3D sub(Point3D p)
     {
-        return new Point3D(m_jso.minus(p.getJSO()));
+        return new Point3D(m_jso.sub(p.getJSO()));
     }
 
     public final Point3D div(double d) throws GeometryException
@@ -144,7 +144,12 @@ public final class Point3D
         {
             throw new GeometryException("can't divide by 0");
         }
-        return scale(1.0 / d);
+        return mul(1.0 / d);
+    }
+
+    public final Point3D mul(double d)
+    {
+        return new Point3D(m_jso.scale(d));
     }
 
     public final Point3D scale(double d)
@@ -310,7 +315,7 @@ public final class Point3D
             return length(this);
         };
 
-        public final native Point3DJSO plus(Point3DJSO jso)
+        public final native Point3DJSO add(Point3DJSO jso)
         /*-{
 			return {
 				x : this.x + jso.x,
@@ -319,7 +324,7 @@ public final class Point3D
 			};
         }-*/;
 
-        public final native Point3DJSO minus(Point3DJSO jso)
+        public final native Point3DJSO sub(Point3DJSO jso)
         /*-{
 			return {
 				x : this.x - jso.x,

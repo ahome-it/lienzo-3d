@@ -29,11 +29,11 @@ import com.google.gwt.json.client.JSONArray;
 /**
  * Point3DArray represents an array (or List) with {@link Point3D} objects.
  */
-public class Point3DArray implements Iterable<Point3D>
+public final class Point3DArray implements Iterable<Point3D>
 {
     private final Point3DArrayJSO m_jso;
 
-    public Point3DArray(Point3DArrayJSO jso)
+    Point3DArray(Point3DArrayJSO jso)
     {
         m_jso = jso;
     }
@@ -45,31 +45,33 @@ public class Point3DArray implements Iterable<Point3D>
 
     public Point3DArray()
     {
-        this(Point3DArrayJSO.makePoint3DArrayJSO());
+        this(Point3DArrayJSO.make());
     }
 
-    public Point3DArray(double x, double y)
+    public Point3DArray(double x, double y, double z)
     {
-        this(Point3DArrayJSO.makePoint3DArrayJSO());
+        this(Point3DArrayJSO.make());
+
+        push(x, y, z);
     }
 
     public Point3DArray(Point3D point)
     {
-        this(Point3DArrayJSO.makePoint3DArrayJSO());
+        this(Point3DArrayJSO.make());
 
         push(point);
     }
 
     public Point3DArray(Point3D point, Point3D... points)
     {
-        this(Point3DArrayJSO.makePoint3DArrayJSO());
+        this(Point3DArrayJSO.make());
 
         push(point, points);
     }
 
     public Point3DArray(double[] x, double[] y, double[] z)
     {
-        this(Point3DArrayJSO.makePoint3DArrayJSO());
+        this(Point3DArrayJSO.make());
 
         if (x.length != y.length)
         {
@@ -87,7 +89,7 @@ public class Point3DArray implements Iterable<Point3D>
 
     public Point3DArray(double[][] points)
     {
-        this(Point3DArrayJSO.makePoint3DArrayJSO());
+        this(Point3DArrayJSO.make());
 
         for (int i = 0; i < points.length; i++)
         {
@@ -103,27 +105,27 @@ public class Point3DArray implements Iterable<Point3D>
 
     public final Point3DArray push(Point3D point)
     {
-        getJSO().push(point.getJSO());
+        m_jso.push(point.getJSO());
 
         return this;
     }
 
     public final Point3DArray push(double x, double y, double z)
     {
-        getJSO().push(Point3DJSO.make(x, y, z));
+        m_jso.push(Point3DJSO.make(x, y, z));
 
         return this;
     }
 
     public final Point3DArray push(Point3D point, Point3D... points)
     {
-        getJSO().push(point.getJSO());
+        m_jso.push(point.getJSO());
 
         if (points != null)
         {
             for (int i = 0; i < points.length; i++)
             {
-                getJSO().push(points[i].getJSO());
+                m_jso.push(points[i].getJSO());
             }
         }
         return this;
@@ -131,17 +133,17 @@ public class Point3DArray implements Iterable<Point3D>
 
     public final int size()
     {
-        return getJSO().length();
+        return m_jso.length();
     }
 
-    public final Point3D getPoint(int i)
+    public final Point3D get(int i)
     {
-        return new Point3D(getJSO().get(i));
+        return new Point3D(m_jso.get(i));
     }
 
-    public final Point3DArray setPoint(int i, Point3D p)
+    public final Point3DArray set(int i, Point3D p)
     {
-        getJSO().set(i, p.getJSO());
+        m_jso.set(i, p.getJSO());
 
         return this;
     }
@@ -168,7 +170,7 @@ public class Point3DArray implements Iterable<Point3D>
 
         for (int i = 0; i < leng; i++)
         {
-            list.add(getPoint(i));
+            list.add(get(i));
         }
         return Collections.unmodifiableCollection(list);
     }
@@ -201,9 +203,9 @@ public class Point3DArray implements Iterable<Point3D>
 			this.pop();
         }-*/;
 
-        public static final native Point3DArrayJSO makePoint3DArrayJSO()
-        /*-{
-			return [];
-        }-*/;
+        public static final Point3DArrayJSO make()
+        {
+            return JsArray.createArray().cast();
+        }
     }
 }
