@@ -175,10 +175,15 @@ public final class Point3DArray implements Iterable<Point3D>
         return Collections.unmodifiableCollection(list);
     }
 
+    public final String toJSONString()
+    {
+        return new JSONArray(m_jso).toString();
+    }
+
     @Override
     public String toString()
     {
-        return new JSONArray(getJSO()).toString();
+        return toJSONString();
     }
 
     @Override

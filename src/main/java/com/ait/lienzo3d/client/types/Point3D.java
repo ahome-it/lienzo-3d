@@ -115,27 +115,22 @@ public final class Point3D
 
     public final double getLength()
     {
-        return m_jso.getLength();
+        return Point3DJSO.length(m_jso);
     };
-
+    
     public final double distance(Point3D other)
     {
-        return m_jso.distance(other.getJSO());
-    };
-
-    public static final double distance(Point3D a, Point3D b)
-    {
-        return Point3DJSO.distance(a.getJSO(), b.getJSO());
+        return Point3DJSO.distance(m_jso, other.getJSO());
     };
 
     public final Point3D add(Point3D p)
     {
-        return new Point3D(m_jso.add(p.getJSO()));
+        return new Point3D(Point3DJSO.add(m_jso, p.getJSO()));
     }
 
     public final Point3D sub(Point3D p)
     {
-        return new Point3D(m_jso.sub(p.getJSO()));
+        return new Point3D(Point3DJSO.sub(m_jso, p.getJSO()));
     }
 
     public final Point3D div(double d) throws GeometryException
@@ -149,12 +144,12 @@ public final class Point3D
 
     public final Point3D mul(double d)
     {
-        return new Point3D(m_jso.scale(d));
+        return scale(d);
     }
 
     public final Point3D scale(double d)
     {
-        return new Point3D(m_jso.scale(d));
+        return new Point3D(Point3DJSO.scale(m_jso, d));
     }
 
     public final Point3D unit() throws GeometryException
@@ -170,7 +165,7 @@ public final class Point3D
 
     public final double thetaTo(Point3D p)
     {
-        return m_jso.thetaTo(p.getJSO());
+        return Point3DJSO.thetaTo(m_jso, p.getJSO());
     }
 
     public final Point3D copy()
@@ -180,12 +175,17 @@ public final class Point3D
 
     public final double dot(Point3D p)
     {
-        return m_jso.dot(p.getJSO());
+        return Point3DJSO.dot(m_jso, p.getJSO());
     }
 
     public final Point3D cross(Point3D p)
     {
-        return new Point3D(m_jso.cross(p.getJSO()));
+        return new Point3D(Point3DJSO.cross(m_jso, p.getJSO()));
+    }
+    
+    public final Point3D avg(Point3D p)
+    {
+        return new Point3D(Point3DJSO.avg(m_jso, p.getJSO()));
     }
 
     @Override
@@ -199,13 +199,13 @@ public final class Point3D
         return m_jso;
     }
 
-    public static class Point3DJSO extends JavaScriptObject
+    public static final class Point3DJSO extends JavaScriptObject
     {
         protected Point3DJSO()
         {
         }
 
-        public static native Point3DJSO make(double xval, double yval, double zval)
+        public static final native Point3DJSO make(double xval, double yval, double zval)
         /*-{
 			return {
 				x : xval,
@@ -214,18 +214,46 @@ public final class Point3D
 			};
         }-*/;
 
-        public final native static double distance(Point3DJSO a, Point3DJSO b)
+        private final native Point3DJSO copy()
         /*-{
-			var dx = b.x - a.x;
-
-			var dy = b.y - a.y;
-
-			var dz = b.z - a.z;
-
-			return Math.sqrt((dx * dx) + (dy * dy) * (dz * dz));
+			return {
+				x : this.x,
+				y : this.y,
+				z : this.z
+			};
         }-*/;
 
-        public final native static double length(Point3DJSO a)
+        private final native double getX()
+        /*-{
+			return this.x;
+        }-*/;
+
+        private final native void setX(double x)
+        /*-{
+			this.x = x;
+        }-*/;
+
+        private final native double getY()
+        /*-{
+			return this.y;
+        }-*/;
+
+        private final native void setY(double y)
+        /*-{
+			this.y = y;
+        }-*/;
+
+        private final native double getZ()
+        /*-{
+			return this.z;
+        }-*/;
+
+        private final native void setZ(double z)
+        /*-{
+			this.z = z;
+        }-*/;
+
+        private static final native double length(Point3DJSO a)
         /*-{
 			var dx = a.x;
 
@@ -236,109 +264,77 @@ public final class Point3D
 			return Math.sqrt((dx * dx) + (dy * dy) + (dz * dz));
         }-*/;
 
-        public native Point3DJSO copy()
+        private static final native double distance(Point3DJSO a, Point3DJSO b)
+        /*-{
+			var dx = a.x - b.x;
+
+			var dy = a.y - b.y;
+
+			var dz = a.z - b.z;
+
+			return Math.sqrt((dx * dx) + (dy * dy) * (dz * dz));
+        }-*/;
+
+        private static final native double dot(Point3DJSO a, Point3DJSO b)
+        /*-{
+			return a.x * b.x + a.y * b.y + a.z * b.z;
+        }-*/;
+
+        private static final native double thetaTo(Point3DJSO a, Point3DJSO b)
+        /*-{
+			var dt = a.x * b.x + a.y * b.y + a.z * b.z;
+
+			var dx = a.y * b.z - a.z * b.y;
+
+			var dy = a.z * b.x - a.x * b.z;
+
+			var dz = a.x * b.y - a.y * b.x;
+
+			return Math.atan2(Math.sqrt((dx * dx) + (dy * dy) + (dz * dz)), dt);
+        }-*/;
+
+        private static final native Point3DJSO add(Point3DJSO a, Point3DJSO b)
         /*-{
 			return {
-				x : this.x,
-				y : this.y,
-				z : this.z
+				x : a.x + b.x,
+				y : a.y + b.y,
+				z : a.z + b.z
 			};
         }-*/;
 
-        public final native double dot(Point3DJSO p)
-        /*-{
-			return this.x * p.x + this.y * p.y + this.z * p.z;
-        }-*/;
-
-        public final double thetaTo(Point3DJSO p)
-        {
-            return thetaTo_(p, dot(p));
-        }
-
-        private final native double thetaTo_(Point3DJSO p, double dot)
-        /*-{
-			var dx = this.y * p.z - this.z * p.y;
-
-			var dy = this.z * p.x - this.x * p.z;
-
-			var dz = this.x * p.y - this.y * p.x;
-
-			return Math.atan2(Math.sqrt(dx * dx + dy * dy + dz * dz), dot);
-        }-*/;
-
-        private final native Point3DJSO cross(Point3DJSO p)
+        private static final native Point3DJSO sub(Point3DJSO a, Point3DJSO b)
         /*-{
 			return {
-				x : this.y * p.z - this.z * p.y,
-				y : this.z * p.x - this.x * p.z,
-				z : this.x * p.y - this.y * p.x
+				x : a.x - b.x,
+				y : a.y - b.y,
+				z : a.z - b.z
 			};
         }-*/;
 
-        public final native double getX()
-        /*-{
-			return this.x;
-        }-*/;
-
-        public final native void setX(double x)
-        /*-{
-			this.x = x;
-        }-*/;
-
-        public final native double getY()
-        /*-{
-			return this.y;
-        }-*/;
-
-        public final native void setY(double y)
-        /*-{
-			this.y = y;
-        }-*/;
-
-        public final native double getZ()
-        /*-{
-			return this.z;
-        }-*/;
-
-        public final native void setZ(double z)
-        /*-{
-			this.z = z;
-        }-*/;
-
-        public final double distance(Point3DJSO other)
-        {
-            return distance(this, other);
-        };
-
-        public final double getLength()
-        {
-            return length(this);
-        };
-
-        public final native Point3DJSO add(Point3DJSO jso)
+        private static final native Point3DJSO scale(Point3DJSO a, double d)
         /*-{
 			return {
-				x : this.x + jso.x,
-				y : this.y + jso.y,
-				z : this.z + jso.z
+				x : a.x * d,
+				y : a.y * d,
+				z : a.z * d
 			};
         }-*/;
 
-        public final native Point3DJSO sub(Point3DJSO jso)
+        private static final native Point3DJSO avg(Point3DJSO a, Point3DJSO b)
         /*-{
 			return {
-				x : this.x - jso.x,
-				y : this.y - jso.y,
-				z : this.z - jso.z
+				x : ((a.x + b.x) / 2),
+				y : ((a.y + b.y) / 2),
+				z : ((a.z + b.z) / 2)
 			};
         }-*/;
 
-        public final native Point3DJSO scale(double d)
+        private static final native Point3DJSO cross(Point3DJSO a, Point3DJSO b)
         /*-{
 			return {
-				x : this.x * d,
-				y : this.y * d,
-				z : this.z * d
+				x : (a.y * b.z - a.z * b.y),
+				y : (a.z * b.x - a.x * b.z),
+				z : (a.x * b.y - a.y * b.x)
 			};
         }-*/;
     }
