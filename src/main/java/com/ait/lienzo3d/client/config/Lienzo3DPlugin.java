@@ -1,5 +1,5 @@
 /*
-   Copyright (c) 2014 Ahome' Innovation Technologies. All rights reserved.
+   Copyright (c) 2014,2015 Ahome' Innovation Technologies. All rights reserved.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -21,9 +21,12 @@ import java.util.Collection;
 
 import com.ait.lienzo.client.core.config.ILienzoPlugin;
 import com.ait.lienzo.client.core.shape.json.IFactory;
+import com.ait.lienzo3d.client.types.Camera;
 
 public class Lienzo3DPlugin implements ILienzoPlugin
 {
+    private final ArrayList<IFactory<?>> m_factories = new ArrayList<IFactory<?>>();
+
     public Lienzo3DPlugin()
     {
     }
@@ -37,6 +40,10 @@ public class Lienzo3DPlugin implements ILienzoPlugin
     @Override
     public Collection<IFactory<?>> getFactories()
     {
-        return new ArrayList<IFactory<?>>();
+        if (m_factories.isEmpty())
+        {
+            m_factories.add(new Camera.CameraFactory());
+        }
+        return m_factories;
     }
 }
