@@ -28,6 +28,7 @@ import com.ait.lienzo.client.core.types.MetaData;
 import com.ait.lienzo.client.core.types.NFastStringMapMixedJSO;
 import com.ait.lienzo.client.core.util.UUID;
 import com.ait.lienzo.shared.core.types.NodeType;
+import com.ait.lienzo3d.client.Attribute3D;
 import com.ait.lienzo3d.client.Attributes3D;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.json.client.JSONObject;
@@ -269,20 +270,20 @@ public abstract class BaseObject3D<T extends BaseObject3D<T>> implements IJSONSe
         return getFactory().getRequiredAttributes();
     }
 
-    protected static abstract class Base3DFactory<T extends IJSONSerializable<T>> extends AbstractFactory<T>
+    protected static abstract class BaseObject3DFactory<T extends IJSONSerializable<T>> extends AbstractFactory<T>
     {
-        protected Base3DFactory(final Type3D type)
+        protected BaseObject3DFactory(final Type3D type)
         {
             this(type.getValue());
         }
 
-        protected Base3DFactory(final String typeName)
+        protected BaseObject3DFactory(final String typeName)
         {
             super(typeName);
 
-            addAttribute(Attribute.ID);
+            addAttribute(Attribute3D.ID);
 
-            addAttribute(Attribute.NAME);
+            addAttribute(Attribute3D.NAME);
         }
 
         /**

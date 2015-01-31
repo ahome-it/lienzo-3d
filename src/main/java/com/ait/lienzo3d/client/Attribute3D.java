@@ -23,6 +23,12 @@ public class Attribute3D extends Attribute
 {
     public static final Attribute Z                   = new Attribute3D("z", "", "", AttributeType3D.NUMBER_TYPE);
 
+    public static final Attribute VIEW_SCALE          = new Attribute3D("viewScale", "", "", AttributeType3D.POINT3D_TYPE);
+
+    public static final Attribute VIEW_SCALE_VALUE    = new Attribute3D("viewScaleValue", "", "", AttributeType3D.NUMBER_TYPE);
+
+    public static final Attribute VIEW_POSITION       = new Attribute3D("viewPosition", "", "", AttributeType3D.POINT3D_TYPE);
+
     public static final Attribute CAMERA_ARM_LENGTH   = new Attribute3D("cameraArmLength", "", "", AttributeType3D.NUMBER_TYPE);
 
     public static final Attribute CAMERA_ARM_LOCATION = new Attribute3D("cameraArmLocation", "", "", AttributeType3D.POINT3D_TYPE);

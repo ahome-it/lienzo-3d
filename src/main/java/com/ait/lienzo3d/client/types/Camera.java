@@ -25,11 +25,9 @@ import com.google.gwt.json.client.JSONObject;
 
 public class Camera extends BaseObject3D<Camera>
 {
-    private static final Point3D SCALE_1    = new Point3D(1, 1, 1);
+    private final Point3D m_location = new Point3D(0, 0, 0);
 
-    private final Point3D        m_location = new Point3D(0, 0, 0);
-
-    private final Point3D        m_rotation = new Point3D(0.5 * Math.PI, 0, 0);
+    private final Point3D m_rotation = new Point3D(0.5 * Math.PI, 0, 0);
 
     public Camera()
     {
@@ -118,13 +116,10 @@ public class Camera extends BaseObject3D<Camera>
         return m_rotation;
     }
 
-    public final Point3D projectToTranslation(final Point3D point)
+    public final Point3D projectToTranslation(final Point3D point, final IViewable3D<?> viewable)
     {
-        return projectToTranslation(point, SCALE_1);
-    }
+        final Point3D scale = viewable.getViewScale();
 
-    public final Point3D projectToTranslation(final Point3D point, final Point3D scale)
-    {
         final double ax = point.getX() * scale.getX();
 
         final double ay = point.getY() * scale.getY();
@@ -164,8 +159,10 @@ public class Camera extends BaseObject3D<Camera>
         return new Point3D(dx, dy, dz);
     }
 
-    public final Point2D projectToScreen(final Point3D point, final Point3D focal, final double x, final double y, final double w, final double h, final boolean perspective)
+    public final Point2D projectToScreen(final Point3D point, final IViewable3D<?> viewable, final double x, final double y, final double w, final double h, final boolean perspective)
     {
+        final Point3D focal = viewable.getViewPosition();
+
         final double fx = focal.getX();
 
         final double fy = focal.getY();
@@ -199,14 +196,9 @@ public class Camera extends BaseObject3D<Camera>
         return new Point2D(x + bx * w, y - by * h);
     }
 
-    public final Point2D projectTo2D(final Point3D point, final Point3D focal, final double x, final double y, final double w, final double h, final boolean perspective)
+    public final Point2D projectTo2D(final Point3D point, final IViewable3D<?> viewable, final double x, final double y, final double w, final double h, final boolean perspective)
     {
-        return projectToScreen(projectToTranslation(point), focal, x, y, w, y, perspective);
-    }
-
-    public final Point2D projectTo2D(final Point3D point, final Point3D focal, final Point3D scale, final double x, final double y, final double w, final double h, final boolean perspective)
-    {
-        return projectToScreen(projectToTranslation(point, scale), focal, x, y, w, y, perspective);
+        return projectToScreen(projectToTranslation(point, viewable), viewable, x, y, w, y, perspective);
     }
 
     @Override
@@ -215,17 +207,17 @@ public class Camera extends BaseObject3D<Camera>
         return new CameraFactory();
     }
 
-    public static class CameraFactory extends Base3DFactory<Camera>
+    public static class CameraFactory extends BaseObject3DFactory<Camera>
     {
         public CameraFactory()
         {
             super(Type3D.CAMERA);
 
-            addAttribute(Attribute3D.CAMERA_ARM_LENGTH, true);
+            addAttribute(Attribute3D.CAMERA_ARM_LENGTH);
 
-            addAttribute(Attribute3D.CAMERA_ARM_LOCATION, true);
+            addAttribute(Attribute3D.CAMERA_ARM_LOCATION);
 
-            addAttribute(Attribute3D.CAMERA_ARM_ROTATION, true);
+            addAttribute(Attribute3D.CAMERA_ARM_ROTATION);
         }
 
         @Override
