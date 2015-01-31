@@ -19,7 +19,6 @@ package com.ait.lienzo3d.client.types;
 import java.util.Collection;
 
 import com.ait.lienzo.client.core.Attribute;
-import com.ait.lienzo.client.core.shape.Attributes;
 import com.ait.lienzo.client.core.shape.json.AbstractFactory;
 import com.ait.lienzo.client.core.shape.json.IJSONSerializable;
 import com.ait.lienzo.client.core.shape.json.JSONDeserializer;
@@ -29,6 +28,7 @@ import com.ait.lienzo.client.core.types.MetaData;
 import com.ait.lienzo.client.core.types.NFastStringMapMixedJSO;
 import com.ait.lienzo.client.core.util.UUID;
 import com.ait.lienzo.shared.core.types.NodeType;
+import com.ait.lienzo3d.client.Attributes3D;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONString;
@@ -36,13 +36,13 @@ import com.google.gwt.json.client.JSONValue;
 
 public abstract class BaseObject3D<T extends BaseObject3D<T>> implements IJSONSerializable<T>
 {
-    private final Type3D     m_type;
+    private final Type3D       m_type;
 
-    private final Attributes m_attr;
+    private final Attributes3D m_attr;
 
-    private final MetaData   m_meta;
+    private final MetaData     m_meta;
 
-    private String           m_uuid;
+    private String             m_uuid = null;
 
     protected BaseObject3D(Type3D type)
     {
@@ -50,7 +50,7 @@ public abstract class BaseObject3D<T extends BaseObject3D<T>> implements IJSONSe
 
         m_meta = new MetaData();
 
-        m_attr = new Attributes();
+        m_attr = new Attributes3D();
     }
 
     protected BaseObject3D(final Type3D type, final JSONObject node, final ValidationContext ctx) throws ValidationException
@@ -59,7 +59,7 @@ public abstract class BaseObject3D<T extends BaseObject3D<T>> implements IJSONSe
 
         if (null == node)
         {
-            m_attr = new Attributes();
+            m_attr = new Attributes3D();
 
             m_meta = new MetaData();
 
@@ -69,7 +69,7 @@ public abstract class BaseObject3D<T extends BaseObject3D<T>> implements IJSONSe
 
         if (null == aval)
         {
-            m_attr = new Attributes();
+            m_attr = new Attributes3D();
         }
         else
         {
@@ -77,7 +77,7 @@ public abstract class BaseObject3D<T extends BaseObject3D<T>> implements IJSONSe
 
             if (null == aobj)
             {
-                m_attr = new Attributes();
+                m_attr = new Attributes3D();
             }
             else
             {
@@ -85,11 +85,11 @@ public abstract class BaseObject3D<T extends BaseObject3D<T>> implements IJSONSe
 
                 if (null == ajso)
                 {
-                    m_attr = new Attributes();
+                    m_attr = new Attributes3D();
                 }
                 else
                 {
-                    m_attr = new Attributes(ajso);
+                    m_attr = new Attributes3D(ajso);
                 }
             }
         }
@@ -254,7 +254,7 @@ public abstract class BaseObject3D<T extends BaseObject3D<T>> implements IJSONSe
         return uuid().equals(that.uuid());
     }
 
-    public final Attributes getAttributes()
+    public final Attributes3D getAttributes()
     {
         return m_attr;
     }

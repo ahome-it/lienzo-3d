@@ -17,6 +17,7 @@
 package com.ait.lienzo3d.client;
 
 import com.ait.lienzo.client.core.AttributeType;
+import com.ait.lienzo.client.core.shape.json.validators.ArrayValidator;
 import com.ait.lienzo.client.core.shape.json.validators.IAttributeTypeValidator;
 import com.ait.lienzo3d.client.shape.json.validators.CameraArmRotationValidator;
 import com.ait.lienzo3d.client.shape.json.validators.Point3DValidator;
@@ -24,6 +25,8 @@ import com.ait.lienzo3d.client.shape.json.validators.Point3DValidator;
 public class AttributeType3D extends AttributeType
 {
     public static AttributeType POINT3D_TYPE             = new AttributeType3D(Point3DValidator.INSTANCE);
+
+    public static AttributeType POINT3D_ARRAY_TYPE       = new AttributeType3D(new ArrayValidator(Point3DValidator.INSTANCE));
 
     public static AttributeType CAMERA_ARM_ROTATION_TYPE = new AttributeType3D(CameraArmRotationValidator.INSTANCE);
 

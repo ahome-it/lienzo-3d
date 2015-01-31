@@ -24,14 +24,95 @@ import com.google.gwt.json.client.JSONObject;
 
 public class Camera extends BaseObject3D<Camera>
 {
+    private final Point3D m_location = new Point3D(0, 0, 0);
+
+    private final Point3D m_rotation = new Point3D(0.5 * Math.PI, 0, 0);
+
     public Camera()
     {
         super(Type3D.CAMERA);
+
+        refresh();
     }
 
     protected Camera(final JSONObject node, final ValidationContext ctx) throws ValidationException
     {
         super(Type3D.CAMERA, node, ctx);
+
+        refresh();
+    }
+
+    public Camera setCameraArmLength(double length)
+    {
+        getAttributes().setCameraArmLength(length);
+
+        return refresh();
+    }
+
+    public double getCameraArmLength()
+    {
+        return getAttributes().getCameraArmLength();
+    }
+
+    public Camera setCameraArmLocation(Point3D location)
+    {
+        getAttributes().setCameraArmLocation(location);
+
+        return refresh();
+    }
+
+    public Point3D getCameraArmLocation()
+    {
+        return getAttributes().getCameraArmLocation();
+    }
+
+    public Camera setCameraArmRotation(CameraArmRotation rotation)
+    {
+        getAttributes().setCameraArmRotation(rotation);
+
+        return refresh();
+    }
+
+    public CameraArmRotation getCameraArmRotation()
+    {
+        return getAttributes().getCameraArmRotation();
+    }
+
+    public final Camera refresh()
+    {
+        final double length = getCameraArmLength();
+
+        final Point3D location = getCameraArmLocation();
+
+        final CameraArmRotation rotation = getCameraArmRotation();
+
+        final double h = rotation.getH();
+
+        final double v = rotation.getV();
+
+        m_location.setX(location.getX() - length * Math.sin(h) * Math.cos(v));
+
+        m_location.setY(location.getY() - length * Math.cos(h) * Math.cos(v));
+
+        m_location.setZ(location.getZ() + length * Math.sin(v));
+
+        m_rotation.setX(Math.PI / 2 - v);
+
+        m_rotation.setY(0);
+
+        m_rotation.setZ(0 - h);
+
+        return this;
+    }
+
+    public final Point3D getCameraLocation()
+    {
+        return m_location;
+    }
+
+    public final Point3D getCameraRotation()
+    {
+        return m_rotation;
     }
 
     @Override

@@ -20,4 +20,5 @@
 	<inherits name='com.ait.lienzo.Lienzo' />
 	<entry-point class='com.ait.lienzo3d.client.config.Lienzo3DEntryPoint' />
 	<source path='client' />
+	<source path='shared' />
 </module>
