@@ -20,6 +20,7 @@ import com.ait.lienzo.client.core.shape.json.IFactory;
 import com.ait.lienzo.client.core.shape.json.validators.ValidationContext;
 import com.ait.lienzo.client.core.shape.json.validators.ValidationException;
 import com.ait.lienzo.client.core.types.Point2D;
+import com.ait.lienzo.client.core.types.Point2DArray;
 import com.ait.lienzo3d.client.Attribute3D;
 import com.google.gwt.json.client.JSONObject;
 
@@ -159,6 +160,65 @@ public class Camera extends BaseObject3D<Camera>
         return new Point3D(dx, dy, dz);
     }
 
+    public final Point3DArray projectToTranslation(final Point3DArray points, final IViewable3D<?> viewable)
+    {
+        final Point3D scale = viewable.getViewScale();
+
+        final double vx = scale.getX();
+
+        final double vy = scale.getY();
+
+        final double vz = scale.getZ();
+
+        final double lx = m_location.getX();
+
+        final double ly = m_location.getY();
+
+        final double lz = m_location.getZ();
+
+        final double rx = m_rotation.getX();
+
+        final double ry = m_rotation.getY();
+
+        final double rz = m_rotation.getZ();
+
+        final double sx = Math.sin(rx);
+
+        final double cx = Math.cos(rx);
+
+        final double sy = Math.sin(ry);
+
+        final double cy = Math.cos(ry);
+
+        final double sz = Math.sin(rz);
+
+        final double cz = Math.cos(rz);
+
+        final int size = points.size();
+
+        final Point3DArray buffer = new Point3DArray();
+
+        for (int i = 0; i < size; i++)
+        {
+            final Point3D point = points.get(i);
+
+            final double ax = point.getX() * vx;
+
+            final double ay = point.getY() * vy;
+
+            final double az = point.getZ() * vz;
+
+            final double dx = cy * (sz * (ay - ly) + cz * (ax - lx)) - sy * (az - lz);
+
+            final double dy = sx * (cy * (az - lz) + sy * (sz * (ay - ly) + cz * (ax - lx))) + cx * (cz * (ay - ly) - sz * (ax - lx));
+
+            final double dz = cx * (cy * (az - lz) + sy * (sz * (ay - ly) + cz * (ax - lx))) - sx * (cz * (ay - ly) - sz * (ax - lx));
+
+            buffer.push(new Point3D(dx, dy, dz));
+        }
+        return buffer;
+    }
+
     public final Point2D projectToScreen(final Point3D point, final IViewable3D<?> viewable, final double x, final double y, final double w, final double h, final boolean perspective)
     {
         final Point3D focal = viewable.getViewPosition();
@@ -196,9 +256,61 @@ public class Camera extends BaseObject3D<Camera>
         return new Point2D(x + bx * w, y - by * h);
     }
 
+    public final Point2DArray projectToScreen(final Point3DArray points, final IViewable3D<?> viewable, final double x, final double y, final double w, final double h, final boolean perspective)
+    {
+        final Point3D focal = viewable.getViewPosition();
+
+        final double fx = focal.getX();
+
+        final double fy = focal.getY();
+
+        final double fz = focal.getZ();
+
+        final int size = points.size();
+
+        final Point2DArray buffer = new Point2DArray();
+
+        final double fc = -(fz / getCameraArmLength());
+
+        for (int i = 0; i < size; i++)
+        {
+            double bx;
+
+            double by;
+
+            final Point3D point = points.get(i);
+
+            final double px = point.getX();
+
+            final double py = point.getY();
+
+            final double pz = point.getZ();
+
+            if (perspective)
+            {
+                bx = (px - fx) * (fz / pz);
+
+                by = (py - fy) * (fz / pz);
+            }
+            else
+            {
+                bx = px * fc;
+
+                by = py * fc;
+            }
+            buffer.push(new Point2D(x + bx * w, y - by * h));
+        }
+        return buffer;
+    }
+
     public final Point2D projectTo2D(final Point3D point, final IViewable3D<?> viewable, final double x, final double y, final double w, final double h, final boolean perspective)
     {
         return projectToScreen(projectToTranslation(point, viewable), viewable, x, y, w, y, perspective);
+    }
+
+    public final Point2DArray projectTo2D(final Point3DArray points, final IViewable3D<?> viewable, final double x, final double y, final double w, final double h, final boolean perspective)
+    {
+        return projectToScreen(projectToTranslation(points, viewable), viewable, x, y, w, y, perspective);
     }
 
     @Override
