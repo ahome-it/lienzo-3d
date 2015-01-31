@@ -19,14 +19,17 @@ package com.ait.lienzo3d.client.types;
 import com.ait.lienzo.client.core.shape.json.IFactory;
 import com.ait.lienzo.client.core.shape.json.validators.ValidationContext;
 import com.ait.lienzo.client.core.shape.json.validators.ValidationException;
+import com.ait.lienzo.client.core.types.Point2D;
 import com.ait.lienzo3d.client.Attribute3D;
 import com.google.gwt.json.client.JSONObject;
 
 public class Camera extends BaseObject3D<Camera>
 {
-    private final Point3D m_location = new Point3D(0, 0, 0);
+    private static final Point3D SCALE_1    = new Point3D(1, 1, 1);
 
-    private final Point3D m_rotation = new Point3D(0.5 * Math.PI, 0, 0);
+    private final Point3D        m_location = new Point3D(0, 0, 0);
+
+    private final Point3D        m_rotation = new Point3D(0.5 * Math.PI, 0, 0);
 
     public Camera()
     {
@@ -113,6 +116,97 @@ public class Camera extends BaseObject3D<Camera>
     public final Point3D getCameraRotation()
     {
         return m_rotation;
+    }
+
+    public final Point3D projectToTranslation(final Point3D point)
+    {
+        return projectToTranslation(point, SCALE_1);
+    }
+
+    public final Point3D projectToTranslation(final Point3D point, final Point3D scale)
+    {
+        final double ax = point.getX() * scale.getX();
+
+        final double ay = point.getY() * scale.getY();
+
+        final double az = point.getZ() * scale.getZ();
+
+        final double lx = m_location.getX();
+
+        final double ly = m_location.getY();
+
+        final double lz = m_location.getZ();
+
+        final double rx = m_rotation.getX();
+
+        final double ry = m_rotation.getY();
+
+        final double rz = m_rotation.getZ();
+
+        final double sx = Math.sin(rx);
+
+        final double cx = Math.cos(rx);
+
+        final double sy = Math.sin(ry);
+
+        final double cy = Math.cos(ry);
+
+        final double sz = Math.sin(rz);
+
+        final double cz = Math.cos(rz);
+
+        final double dx = cy * (sz * (ay - ly) + cz * (ax - lx)) - sy * (az - lz);
+
+        final double dy = sx * (cy * (az - lz) + sy * (sz * (ay - ly) + cz * (ax - lx))) + cx * (cz * (ay - ly) - sz * (ax - lx));
+
+        final double dz = cx * (cy * (az - lz) + sy * (sz * (ay - ly) + cz * (ax - lx))) - sx * (cz * (ay - ly) - sz * (ax - lx));
+
+        return new Point3D(dx, dy, dz);
+    }
+
+    public final Point2D projectToScreen(final Point3D point, final Point3D focal, final double x, final double y, final double w, final double h, final boolean perspective)
+    {
+        final double fx = focal.getX();
+
+        final double fy = focal.getY();
+
+        final double fz = focal.getZ();
+
+        final double px = point.getX();
+
+        final double py = point.getY();
+
+        final double pz = point.getZ();
+
+        double bx;
+
+        double by;
+
+        if (perspective)
+        {
+            bx = (px - fx) * (fz / pz);
+
+            by = (py - fy) * (fz / pz);
+        }
+        else
+        {
+            final double fc = -(fz / getCameraArmLength());
+
+            bx = px * fc;
+
+            by = py * fc;
+        }
+        return new Point2D(x + bx * w, y - by * h);
+    }
+
+    public final Point2D projectTo2D(final Point3D point, final Point3D focal, final double x, final double y, final double w, final double h, final boolean perspective)
+    {
+        return projectToScreen(projectToTranslation(point), focal, x, y, w, y, perspective);
+    }
+
+    public final Point2D projectTo2D(final Point3D point, final Point3D focal, final Point3D scale, final double x, final double y, final double w, final double h, final boolean perspective)
+    {
+        return projectToScreen(projectToTranslation(point, scale), focal, x, y, w, y, perspective);
     }
 
     @Override
