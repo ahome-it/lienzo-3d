@@ -19,7 +19,7 @@ package com.ait.lienzo3d.client.shape;
 import java.util.Collection;
 
 import com.ait.lienzo.client.core.Attribute;
-import com.ait.lienzo.client.core.event.AttributeChangedHandler;
+import com.ait.lienzo.client.core.event.AttributesChangedHandler;
 import com.ait.lienzo.client.core.shape.json.AbstractFactory;
 import com.ait.lienzo.client.core.shape.json.IJSONSerializable;
 import com.ait.lienzo.client.core.shape.json.JSONDeserializer;
@@ -281,9 +281,9 @@ public abstract class BaseObject3D<T extends BaseObject3D<T>> implements IJSONSe
         return getFactory().getRequiredAttributes();
     }
 
-    public HandlerRegistration addNodeAttributeChangedHandler(final Attribute attribute, final AttributeChangedHandler handler)
+    public HandlerRegistration addAttributeChangedHandler(final Attribute attribute, final AttributesChangedHandler handler)
     {
-        return m_attr.addAttributeChangedHandler(attribute, handler);
+        return m_attr.addAttributesChangedHandler(attribute, handler);
     }
 
     protected static abstract class BaseObject3DFactory<T extends IJSONSerializable<T>> extends AbstractFactory<T>
