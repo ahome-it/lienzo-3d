@@ -14,11 +14,12 @@
    limitations under the License.
  */
 
-package com.ait.lienzo3d.client.types;
+package com.ait.lienzo3d.client.shape;
 
 import java.util.Collection;
 
 import com.ait.lienzo.client.core.Attribute;
+import com.ait.lienzo.client.core.event.AttributeChangedHandler;
 import com.ait.lienzo.client.core.shape.json.AbstractFactory;
 import com.ait.lienzo.client.core.shape.json.IJSONSerializable;
 import com.ait.lienzo.client.core.shape.json.JSONDeserializer;
@@ -30,7 +31,9 @@ import com.ait.lienzo.client.core.util.UUID;
 import com.ait.lienzo.shared.core.types.NodeType;
 import com.ait.lienzo3d.client.Attribute3D;
 import com.ait.lienzo3d.client.Attributes3D;
+import com.ait.lienzo3d.client.types.Type3D;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONString;
 import com.google.gwt.json.client.JSONValue;
@@ -51,7 +54,9 @@ public abstract class BaseObject3D<T extends BaseObject3D<T>> implements IJSONSe
 
         m_meta = new MetaData();
 
-        m_attr = new Attributes3D();
+        m_attr = new Attributes3D(this);
+
+        refresh();
     }
 
     protected BaseObject3D(final Type3D type, final JSONObject node, final ValidationContext ctx) throws ValidationException
@@ -60,7 +65,7 @@ public abstract class BaseObject3D<T extends BaseObject3D<T>> implements IJSONSe
 
         if (null == node)
         {
-            m_attr = new Attributes3D();
+            m_attr = new Attributes3D(this);
 
             m_meta = new MetaData();
 
@@ -70,7 +75,7 @@ public abstract class BaseObject3D<T extends BaseObject3D<T>> implements IJSONSe
 
         if (null == aval)
         {
-            m_attr = new Attributes3D();
+            m_attr = new Attributes3D(this);
         }
         else
         {
@@ -78,7 +83,7 @@ public abstract class BaseObject3D<T extends BaseObject3D<T>> implements IJSONSe
 
             if (null == aobj)
             {
-                m_attr = new Attributes3D();
+                m_attr = new Attributes3D(this);
             }
             else
             {
@@ -86,11 +91,11 @@ public abstract class BaseObject3D<T extends BaseObject3D<T>> implements IJSONSe
 
                 if (null == ajso)
                 {
-                    m_attr = new Attributes3D();
+                    m_attr = new Attributes3D(this);
                 }
                 else
                 {
-                    m_attr = new Attributes3D(ajso);
+                    m_attr = new Attributes3D(ajso, this);
                 }
             }
         }
@@ -124,6 +129,7 @@ public abstract class BaseObject3D<T extends BaseObject3D<T>> implements IJSONSe
                 }
             }
         }
+        refresh();
     }
 
     public T setName(final String name)
@@ -148,6 +154,11 @@ public abstract class BaseObject3D<T extends BaseObject3D<T>> implements IJSONSe
     public String getID()
     {
         return m_attr.getID();
+    }
+
+    public T refresh()
+    {
+        return cast();
     }
 
     @SuppressWarnings("unchecked")
@@ -268,6 +279,11 @@ public abstract class BaseObject3D<T extends BaseObject3D<T>> implements IJSONSe
     public Collection<Attribute> getRequiredAttributes()
     {
         return getFactory().getRequiredAttributes();
+    }
+
+    public HandlerRegistration addNodeAttributeChangedHandler(final Attribute attribute, final AttributeChangedHandler handler)
+    {
+        return m_attr.addAttributeChangedHandler(attribute, handler);
     }
 
     protected static abstract class BaseObject3DFactory<T extends IJSONSerializable<T>> extends AbstractFactory<T>

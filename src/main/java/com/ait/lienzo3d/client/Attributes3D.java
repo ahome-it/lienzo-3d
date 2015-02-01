@@ -17,6 +17,7 @@
 package com.ait.lienzo3d.client;
 
 import com.ait.lienzo.client.core.shape.Attributes;
+import com.ait.lienzo.client.core.shape.json.IJSONSerializable;
 import com.ait.lienzo3d.client.types.CameraArmRotation;
 import com.ait.lienzo3d.client.types.CameraArmRotation.CameraArmRotationJSO;
 import com.ait.lienzo3d.client.types.Point3D;
@@ -25,16 +26,17 @@ import com.google.gwt.core.client.JavaScriptObject;
 
 public class Attributes3D extends Attributes
 {
-    public Attributes3D()
+    public Attributes3D(final IJSONSerializable<?> ser)
     {
+        super(ser);
     }
 
-    public Attributes3D(JavaScriptObject ajso)
+    public Attributes3D(final JavaScriptObject jso, final IJSONSerializable<?> ser)
     {
-        super(ajso);
+        super(jso, ser);
     }
 
-    public final void setZ(double z)
+    public final void setZ(final double z)
     {
         put(Attribute3D.Z.getProperty(), z);
     }
@@ -72,7 +74,7 @@ public class Attributes3D extends Attributes
         return length;
     }
 
-    public final void setCameraArmLocation(Point3D location)
+    public final void setCameraArmLocation(final Point3D location)
     {
         if (null != location)
         {
@@ -86,18 +88,18 @@ public class Attributes3D extends Attributes
 
     public final Point3D getCameraArmLocation()
     {
-        JavaScriptObject location = getObject(Attribute3D.CAMERA_ARM_LOCATION.getProperty());
+        final JavaScriptObject location = getObject(Attribute3D.CAMERA_ARM_LOCATION.getProperty());
 
         if (null != location)
         {
-            Point3DJSO pjso = location.cast();
+            final Point3DJSO pjso = location.cast();
 
             return new Point3D(pjso);
         }
         return new Point3D();
     }
 
-    public final void setCameraArmRotation(CameraArmRotation rotation)
+    public final void setCameraArmRotation(final CameraArmRotation rotation)
     {
         if (null != rotation)
         {
@@ -111,14 +113,74 @@ public class Attributes3D extends Attributes
 
     public final CameraArmRotation getCameraArmRotation()
     {
-        JavaScriptObject rotation = getObject(Attribute3D.CAMERA_ARM_ROTATION.getProperty());
+        final JavaScriptObject rotation = getObject(Attribute3D.CAMERA_ARM_ROTATION.getProperty());
 
         if (null != rotation)
         {
-            CameraArmRotationJSO pjso = rotation.cast();
+            final CameraArmRotationJSO pjso = rotation.cast();
 
             return new CameraArmRotation(pjso);
         }
         return new CameraArmRotation();
+    }
+
+    public final void setViewScale(final Point3D scale)
+    {
+        if (null != scale)
+        {
+            put(Attribute3D.VIEW_SCALE.getProperty(), scale.getJSO());
+        }
+        else
+        {
+            delete(Attribute3D.VIEW_SCALE.getProperty());
+        }
+    }
+
+    public final Point3D getViewScale()
+    {
+        final JavaScriptObject scale = getObject(Attribute3D.VIEW_SCALE.getProperty());
+
+        if (null != scale)
+        {
+            final Point3DJSO pjso = scale.cast();
+
+            return new Point3D(pjso);
+        }
+        return new Point3D(1, 1, 1);
+    }
+
+    public final void setViewPosition(final Point3D position)
+    {
+        if (null != position)
+        {
+            put(Attribute3D.VIEW_POSITION.getProperty(), position.getJSO());
+        }
+        else
+        {
+            delete(Attribute3D.VIEW_POSITION.getProperty());
+        }
+    }
+
+    public final Point3D getViewPosition()
+    {
+        final JavaScriptObject position = getObject(Attribute3D.VIEW_POSITION.getProperty());
+
+        if (null != position)
+        {
+            final Point3DJSO pjso = position.cast();
+
+            return new Point3D(pjso);
+        }
+        return new Point3D(0, 0, 0 - 1);
+    }
+
+    public final void setViewScaleValue(final double value)
+    {
+        put(Attribute3D.VIEW_SCALE_VALUE.getProperty(), value);
+    }
+
+    public final double getViewScaleValue()
+    {
+        return getDouble(Attribute3D.VIEW_SCALE_VALUE.getProperty());
     }
 }

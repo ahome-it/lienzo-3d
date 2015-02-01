@@ -14,17 +14,19 @@
    limitations under the License.
  */
 
-package com.ait.lienzo3d.client.types;
+package com.ait.lienzo3d.client.shape;
 
 import com.ait.lienzo.client.core.shape.json.validators.ValidationContext;
 import com.ait.lienzo.client.core.shape.json.validators.ValidationException;
 import com.ait.lienzo.shared.core.types.NodeType;
 import com.ait.lienzo3d.client.Attribute3D;
+import com.ait.lienzo3d.client.types.Point3D;
+import com.ait.lienzo3d.client.types.Type3D;
 import com.google.gwt.json.client.JSONObject;
 
 public abstract class BaseViewable3D<T extends BaseViewable3D<T>> extends BaseObject3D<T> implements IViewable3D<T>
 {
-    protected BaseViewable3D(Type3D type)
+    protected BaseViewable3D(final Type3D type)
     {
         super(type);
     }
@@ -33,47 +35,53 @@ public abstract class BaseViewable3D<T extends BaseViewable3D<T>> extends BaseOb
     {
         super(type, node, ctx);
     }
-    
+
     @Override
-    public Point3D getViewScale()
+    public T refresh()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return super.refresh();
     }
 
     @Override
-    public T setViewScale(Point3D scale)
+    public Point3D getViewScale()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return getAttributes().getViewScale();
+    }
+
+    @Override
+    public T setViewScale(final Point3D scale)
+    {
+        getAttributes().setViewScale(scale);
+
+        return refresh();
     }
 
     @Override
     public Point3D getViewPosition()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return getAttributes().getViewPosition();
     }
 
     @Override
-    public T setViewPosition(Point3D position)
+    public T setViewPosition(final Point3D position)
     {
-        // TODO Auto-generated method stub
-        return null;
+        getAttributes().setViewPosition(position);
+
+        return refresh();
     }
 
     @Override
     public double getViewScaleValue()
     {
-        // TODO Auto-generated method stub
-        return 0;
+        return getAttributes().getViewScaleValue();
     }
 
     @Override
-    public T setViewScaleValue(double value)
+    public T setViewScaleValue(final double value)
     {
-        // TODO Auto-generated method stub
-        return null;
+        getAttributes().setViewScaleValue(value);
+
+        return refresh();
     }
 
     protected static abstract class BaseViewable3DFactory<T extends BaseViewable3D<T>> extends BaseObject3DFactory<T>

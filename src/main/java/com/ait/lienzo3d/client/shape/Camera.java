@@ -14,14 +14,19 @@
    limitations under the License.
  */
 
-package com.ait.lienzo3d.client.types;
+package com.ait.lienzo3d.client.shape;
 
 import com.ait.lienzo.client.core.shape.json.IFactory;
 import com.ait.lienzo.client.core.shape.json.validators.ValidationContext;
 import com.ait.lienzo.client.core.shape.json.validators.ValidationException;
+import com.ait.lienzo.client.core.types.BoundingBox;
 import com.ait.lienzo.client.core.types.Point2D;
 import com.ait.lienzo.client.core.types.Point2DArray;
 import com.ait.lienzo3d.client.Attribute3D;
+import com.ait.lienzo3d.client.types.CameraArmRotation;
+import com.ait.lienzo3d.client.types.Point3D;
+import com.ait.lienzo3d.client.types.Point3DArray;
+import com.ait.lienzo3d.client.types.Type3D;
 import com.google.gwt.json.client.JSONObject;
 
 public class Camera extends BaseObject3D<Camera>
@@ -33,18 +38,14 @@ public class Camera extends BaseObject3D<Camera>
     public Camera()
     {
         super(Type3D.CAMERA);
-
-        refresh();
     }
 
     protected Camera(final JSONObject node, final ValidationContext ctx) throws ValidationException
     {
         super(Type3D.CAMERA, node, ctx);
-
-        refresh();
     }
 
-    public Camera setCameraArmLength(double length)
+    public Camera setCameraArmLength(final double length)
     {
         getAttributes().setCameraArmLength(length);
 
@@ -56,7 +57,7 @@ public class Camera extends BaseObject3D<Camera>
         return getAttributes().getCameraArmLength();
     }
 
-    public Camera setCameraArmLocation(Point3D location)
+    public Camera setCameraArmLocation(final Point3D location)
     {
         getAttributes().setCameraArmLocation(location);
 
@@ -68,7 +69,7 @@ public class Camera extends BaseObject3D<Camera>
         return getAttributes().getCameraArmLocation();
     }
 
-    public Camera setCameraArmRotation(CameraArmRotation rotation)
+    public Camera setCameraArmRotation(final CameraArmRotation rotation)
     {
         getAttributes().setCameraArmRotation(rotation);
 
@@ -80,7 +81,8 @@ public class Camera extends BaseObject3D<Camera>
         return getAttributes().getCameraArmRotation();
     }
 
-    public final Camera refresh()
+    @Override
+    public Camera refresh()
     {
         final double length = getCameraArmLength();
 
@@ -104,7 +106,7 @@ public class Camera extends BaseObject3D<Camera>
 
         m_rotation.setZ(0 - h);
 
-        return this;
+        return super.refresh();
     }
 
     public final Point3D getCameraLocation()
@@ -219,7 +221,7 @@ public class Camera extends BaseObject3D<Camera>
         return buffer;
     }
 
-    public final Point2D projectToScreen(final Point3D point, final IViewable3D<?> viewable, final double x, final double y, final double w, final double h, final boolean perspective)
+    public final Point2D projectToScreen(final Point3D point, final IViewable3D<?> viewable, final BoundingBox bbox, final boolean perspective)
     {
         final Point3D focal = viewable.getViewPosition();
 
@@ -235,28 +237,28 @@ public class Camera extends BaseObject3D<Camera>
 
         final double pz = point.getZ();
 
-        double bx;
+        double tx;
 
-        double by;
+        double ty;
 
         if (perspective)
         {
-            bx = (px - fx) * (fz / pz);
+            tx = (px - fx) * (fz / pz);
 
-            by = (py - fy) * (fz / pz);
+            ty = (py - fy) * (fz / pz);
         }
         else
         {
             final double fc = -(fz / getCameraArmLength());
 
-            bx = px * fc;
+            tx = px * fc;
 
-            by = py * fc;
+            ty = py * fc;
         }
-        return new Point2D(x + bx * w, y - by * h);
+        return new Point2D(bbox.getX() + tx * bbox.getWidth(), bbox.getY() - ty * bbox.getHeight());
     }
 
-    public final Point2DArray projectToScreen(final Point3DArray points, final IViewable3D<?> viewable, final double x, final double y, final double w, final double h, final boolean perspective)
+    public final Point2DArray projectToScreen(final Point3DArray points, final IViewable3D<?> viewable, final BoundingBox bbox, final boolean perspective)
     {
         final Point3D focal = viewable.getViewPosition();
 
@@ -272,11 +274,19 @@ public class Camera extends BaseObject3D<Camera>
 
         final double fc = -(fz / getCameraArmLength());
 
+        final double bx = bbox.getX();
+
+        final double by = bbox.getY();
+
+        final double bw = bbox.getWidth();
+
+        final double bh = bbox.getHeight();
+
         for (int i = 0; i < size; i++)
         {
-            double bx;
+            double tx;
 
-            double by;
+            double ty;
 
             final Point3D point = points.get(i);
 
@@ -288,29 +298,29 @@ public class Camera extends BaseObject3D<Camera>
 
             if (perspective)
             {
-                bx = (px - fx) * (fz / pz);
+                tx = (px - fx) * (fz / pz);
 
-                by = (py - fy) * (fz / pz);
+                ty = (py - fy) * (fz / pz);
             }
             else
             {
-                bx = px * fc;
+                tx = px * fc;
 
-                by = py * fc;
+                ty = py * fc;
             }
-            buffer.push(new Point2D(x + bx * w, y - by * h));
+            buffer.push(new Point2D(bx + tx * bw, by - ty * bh));
         }
         return buffer;
     }
 
-    public final Point2D projectTo2D(final Point3D point, final IViewable3D<?> viewable, final double x, final double y, final double w, final double h, final boolean perspective)
+    public final Point2D projectTo2D(final Point3D point, final IViewable3D<?> viewable, final BoundingBox bbox, final boolean perspective)
     {
-        return projectToScreen(projectToTranslation(point, viewable), viewable, x, y, w, y, perspective);
+        return projectToScreen(projectToTranslation(point, viewable), viewable, bbox, perspective);
     }
 
-    public final Point2DArray projectTo2D(final Point3DArray points, final IViewable3D<?> viewable, final double x, final double y, final double w, final double h, final boolean perspective)
+    public final Point2DArray projectTo2D(final Point3DArray points, final IViewable3D<?> viewable, final BoundingBox bbox, final boolean perspective)
     {
-        return projectToScreen(projectToTranslation(points, viewable), viewable, x, y, w, y, perspective);
+        return projectToScreen(projectToTranslation(points, viewable), viewable, bbox, perspective);
     }
 
     @Override

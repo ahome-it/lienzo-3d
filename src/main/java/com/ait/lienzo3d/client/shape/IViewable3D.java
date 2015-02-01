@@ -14,7 +14,9 @@
    limitations under the License.
  */
 
-package com.ait.lienzo3d.client.types;
+package com.ait.lienzo3d.client.shape;
+
+import com.ait.lienzo3d.client.types.Point3D;
 
 public interface IViewable3D<T extends IViewable3D<T>>
 {

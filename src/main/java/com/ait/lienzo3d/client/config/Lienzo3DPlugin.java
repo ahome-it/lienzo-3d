@@ -21,7 +21,7 @@ import java.util.Collection;
 
 import com.ait.lienzo.client.core.config.ILienzoPlugin;
 import com.ait.lienzo.client.core.shape.json.IFactory;
-import com.ait.lienzo3d.client.types.Camera;
+import com.ait.lienzo3d.client.shape.Camera;
 
 public class Lienzo3DPlugin implements ILienzoPlugin
 {
